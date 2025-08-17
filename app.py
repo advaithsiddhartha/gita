@@ -18,7 +18,9 @@ def load_index():
 
 index, verses = load_index()
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
-client = InferenceClient(token="YOUR_HF_TOKEN")   # <-- replace with your HF token
+
+# Replace with your Hugging Face token
+client = InferenceClient(token="YOUR_HF_TOKEN")
 
 # -------------------
 # Streamlit UI
@@ -33,7 +35,7 @@ language = st.selectbox("Choose response language:", ["English", "Hindi", "Telug
 submit = st.button("⚔️ Ask Krishna")
 
 if submit and user_input.strip():
-    # Find nearest verse
+    # Find nearest verse from FAISS
     query_emb = embedder.encode([user_input])
     D, I = index.search(np.array(query_emb).astype("float32"), k=1)
     verse_data = verses[I[0][0]]
@@ -62,19 +64,23 @@ if submit and user_input.strip():
     """
 
     with st.spinner("🕉️ Krishna is speaking..."):
-        response = client.text_generation(
+        response = client.chat.completions.create(
             model="HuggingFaceH4/zephyr-7b-beta",
-            prompt=prompt,
-            max_new_tokens=400,
+            messages=[
+                {"role": "system", "content": "You are Lord Krishna, guiding with compassion and wisdom."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=400,
             temperature=0.7
         )
-        krishna_response = response
+        krishna_response = response.choices[0].message["content"]
 
         # Translate if needed
         lang_map = {"English": "en", "Hindi": "hi", "Telugu": "te"}
         if language != "English":
             krishna_response = GoogleTranslator(source="auto", target=lang_map[language]).translate(krishna_response)
 
+    # Display results
     st.subheader("📜 Sanskrit Verse")
     st.markdown(f"<div style='font-size:18px; color:orange;'>{sanskrit_text}</div>", unsafe_allow_html=True)
 
