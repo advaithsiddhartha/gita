@@ -1,6 +1,3 @@
-dont change the code just do the ui changes , now add lots and lots and lots of ui on this to make it look like divine god medium :
-
-
 import streamlit as st
 import faiss
 import json
