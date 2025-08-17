@@ -6,7 +6,6 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 from deep_translator import GoogleTranslator
-
 # -------------------
 # Load FAISS + verses
 # -------------------
