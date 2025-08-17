@@ -1,3 +1,6 @@
+dont change the code just do the ui changes , now add lots and lots and lots of ui on this to make it look like divine god medium :
+
+
 import streamlit as st
 import faiss
 import json
@@ -26,7 +29,6 @@ if not HF_TOKEN:
     st.error("⚠️ Hugging Face token is missing! Please set it in secrets.toml or env.")
 else:
     client = InferenceClient(token=HF_TOKEN)
-
 # -------------------
 # Utility: search verses
 # -------------------
@@ -40,75 +42,14 @@ def find_relevant_verses(query, k=3):
 # -------------------
 st.set_page_config(page_title="🕉️ Krishna's Guidance", page_icon="🪔", layout="centered")
 
-# --- Divine CSS ---
-st.markdown(
-    """
-    <style>
-    body {
-        background: radial-gradient(circle at top, #2c003e, #000000);
-        color: #FFD700;
-        font-family: 'Georgia', serif;
-    }
-    h1, h2, h3, h4 {
-        color: #FFD700 !important;
-        text-shadow: 2px 2px 6px #ffcc00;
-    }
-    .krishna-header {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-    .krishna-header img {
-        max-width: 200px;
-        border-radius: 50%;
-        box-shadow: 0px 0px 40px #FFD700;
-        animation: pulse 4s infinite;
-    }
-    @keyframes pulse {
-        0% { box-shadow: 0px 0px 15px #FFD700; }
-        50% { box-shadow: 0px 0px 35px #ffcc33; }
-        100% { box-shadow: 0px 0px 15px #FFD700; }
-    }
-    .divine-box {
-        border: 2px solid #FFD700;
-        border-radius: 15px;
-        padding: 20px;
-        margin: 20px 0px;
-        background: rgba(255, 215, 0, 0.07);
-        box-shadow: 0px 0px 30px rgba(255, 215, 0, 0.4);
-        font-size: 18px;
-    }
-    .divider {
-        height: 3px;
-        background: linear-gradient(to right, transparent, #FFD700, transparent);
-        margin: 35px 0;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("<h1 style='text-align: center; color: gold;'>🪔 Krishna's Guidance</h1>", unsafe_allow_html=True)
 
-# --- Krishna Header ---
-st.markdown(
-    """
-    <div class="krishna-header">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Krishna_with_Flute.jpg" alt="Lord Krishna">
-        <h1>🪔 Krishna's Divine Guidance 🪔</h1>
-        <p style="font-size:18px; color:#ffdd66;">Seek wisdom as Arjuna did, and receive the words of Krishna.</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+name = st.text_input("What is your name?")
+query = st.text_area("Describe your problem (like Arjuna on the battlefield):")
 
-# --- Input Section ---
-name = st.text_input("🙏 What is your name?")
-query = st.text_area("⚔️ Share your problem (as Arjuna did in Kurukshetra):")
+language = st.selectbox("Choose response language:", ["English", "Hindi", "Telugu"])
+submit = st.button("⚔️ Ask Krishna")
 
-language = st.selectbox("🌐 Choose response language:", ["English", "Hindi", "Telugu"])
-submit = st.button("✨ Ask Krishna ✨")
-
-# -------------------
-# Main Logic
-# -------------------
 if submit and name.strip() and query.strip():
     results = find_relevant_verses(query)
 
@@ -155,20 +96,11 @@ Tone:
     # -------------------
     # Display
     # -------------------
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
-    st.subheader("📜 Krishna's Divine Words")
-    st.markdown(f"<div class='divine-box'>{krishna_response}</div>", unsafe_allow_html=True)
+    st.subheader("📜 Krishna's Guidance")
+    st.markdown(f"<div style='font-size:18px;'>{krishna_response}</div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
     st.subheader("🔎 Relevant Verses")
     for verse in results:
-        st.markdown(
-            f"""
-            <div class="divine-box">
-            <b>🕉️ Chapter {verse['chapter']}, Verse {verse['verse']}</b><br>
-            <i>📜 Sanskrit:</i> {verse['sanskrit']}<br>
-            <i>🔹 English:</i> {verse['english']}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown(f"**🕉️ Chapter {verse['chapter']}, Verse {verse['verse']}**")
+        st.markdown(f"📜 Sanskrit: {verse['sanskrit']}")
+        st.markdown(f"🔹 English: {verse['english']}")
