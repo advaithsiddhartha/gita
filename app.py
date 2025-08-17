@@ -14,7 +14,7 @@ def load_resources():
     index = faiss.read_index("gita_index.faiss")
     with open("gita_verses.json", "r", encoding="utf-8") as f:
         data = json.load(f)
-    model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
+    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     return index, data, model
 
 index, data, model = load_resources()
