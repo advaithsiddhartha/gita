@@ -3,3 +3,4 @@ faiss-cpu
 sentence-transformers
 huggingface-hub
 deep-translator
+os
