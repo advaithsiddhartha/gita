@@ -22,7 +22,10 @@ index, data, model = load_resources()
 
 # Hugging Face client
 HF_TOKEN = os.getenv("HF_TOKEN", st.secrets.get("HF_TOKEN"))
-client = InferenceClient(token=HF_TOKEN)
+if not HF_TOKEN:
+    st.error("⚠️ Hugging Face token is missing! Please set it in secrets.toml or env.")
+else:
+    client = InferenceClient(token=HF_TOKEN)
 # -------------------
 # Utility: search verses
 # -------------------
