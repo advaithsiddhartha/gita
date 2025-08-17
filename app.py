@@ -17,10 +17,10 @@ def load_index():
     return index, verses
 
 index, verses = load_index()
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
+embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", use_auth_token="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")
 
 # Replace with your Hugging Face token
-client = InferenceClient(token="YOUR_HF_TOKEN")
+client = InferenceClient(token="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")
 
 # -------------------
 # Streamlit UI
