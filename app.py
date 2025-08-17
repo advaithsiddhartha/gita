@@ -6,6 +6,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
 from deep_translator import GoogleTranslator
+
 # -------------------
 # Load FAISS + verses
 # -------------------
@@ -14,17 +15,22 @@ def load_resources():
     index = faiss.read_index("gita_index.faiss")
     with open("gita_verses.json", "r", encoding="utf-8") as f:
         data = json.load(f)
+    # ✅ Fixed model identifier
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     return index, data, model
 
 index, data, model = load_resources()
 
+# -------------------
 # Hugging Face client
-HF_TOKEN = os.getenv("HF_TOKEN", st.secrets.get("HF_TOKEN"))
-if not HF_TOKEN:
-    st.error("⚠️ Hugging Face token is missing! Please set it in secrets.toml or env.")
-else:
+# -------------------
+HF_TOKEN = os.getenv("HF_TOKEN", st.secrets.get("HF_TOKEN", None))
+client = None
+if HF_TOKEN:
     client = InferenceClient(token=HF_TOKEN)
+else:
+    st.warning("⚠️ Hugging Face token is missing! LLM responses will not work, but search will.")
+
 # -------------------
 # Utility: search verses
 # -------------------
@@ -49,25 +55,42 @@ submit = st.button("⚔️ Ask Krishna")
 if submit and name.strip() and query.strip():
     results = find_relevant_verses(query)
 
-    # Build prompt
-    prompt = f"""
-You are Lord Krishna, guiding the {name} as a mentor and teacher in the Bhagavad Gita. 
-    """
+    krishna_response = ""
+    if client:
+        # Build prompt
+        prompt = f"""
+You are Lord Krishna, guiding {name} as a mentor and teacher in the Bhagavad Gita. 
 
-    with st.spinner("🕉️ Krishna is speaking..."):
-        response = client.chat.completions.create(
-            model="mistralai/Mistral-7B-Instruct-v0.2",
-            messages=[
-                {"role": "system", "content": "You are Lord Krishna, guiding with compassion and wisdom."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        krishna_response = response.choices[0].message["content"]
+{name}'s Problem:
+{query}
 
-        # Translate if needed
-        lang_map = {"English": "en", "Hindi": "hi", "Telugu": "te"}
-        if language != "English":
-            krishna_response = GoogleTranslator(source="auto", target=lang_map[language]).translate(krishna_response)
+Your task:
+1. Read the problem carefully.
+2. Quote relevant slokas (Sanskrit first).
+3. Provide a simple English translation.
+4. Give a personalised explanation, tying it directly to {name}'s problem.
+5. Use the following knowledge base to support your answer:
+{results}
+
+Tone: Compassionate, wise, and mentor-like (as Krishna speaking directly to Arjuna).
+        """
+
+        with st.spinner("🕉️ Krishna is speaking..."):
+            response = client.chat.completions.create(
+                model="mistralai/Mistral-7B-Instruct-v0.2",
+                messages=[
+                    {"role": "system", "content": "You are Lord Krishna, guiding with compassion and wisdom."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            krishna_response = response.choices[0].message["content"]
+
+            # Translate if needed
+            lang_map = {"English": "en", "Hindi": "hi", "Telugu": "te"}
+            if language != "English":
+                krishna_response = GoogleTranslator(source="auto", target=lang_map[language]).translate(krishna_response)
+    else:
+        krishna_response = "🙏 Please add a valid Hugging Face token to get Krishna's divine guidance."
 
     # -------------------
     # Display
