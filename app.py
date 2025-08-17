@@ -10,17 +10,25 @@ from deep_translator import GoogleTranslator
 # Load FAISS + verses
 # -------------------
 @st.cache_resource
-def load_index():
+def load_resources():
     index = faiss.read_index("gita_index.faiss")
     with open("gita_verses.json", "r", encoding="utf-8") as f:
-        verses = json.load(f)
-    return index, verses
+        data = json.load(f)
+    model = SentenceTransformer("paraphrase-MiniLM-L6-v2")  # light & stable
+    return index, data, model
 
-index, verses = load_index()
-embedder = SentenceTransformer("all-MiniLM-L6-v2", use_auth_token="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")
+index, data, model = load_resources()
 
-# Replace with your Hugging Face token
+# Hugging Face client
 client = InferenceClient(token="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")
+
+# -------------------
+# Utility: search verses
+# -------------------
+def find_relevant_verses(query, k=3):
+    query_embedding = model.encode([query], convert_to_numpy=True)
+    distances, indices = index.search(query_embedding, k)
+    return [data[i] for i in indices[0]]
 
 # -------------------
 # Streamlit UI
@@ -28,50 +36,47 @@ client = InferenceClient(token="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")
 st.set_page_config(page_title="🕉️ Krishna's Guidance", page_icon="🪔", layout="centered")
 
 st.markdown("<h1 style='text-align: center; color: gold;'>🪔 Krishna's Guidance</h1>", unsafe_allow_html=True)
-st.write("Ask your question, Arjuna, and let Krishna guide you...")
 
-user_input = st.text_area("Enter your problem here:", "")
+name = st.text_input("What is your name?")
+query = st.text_area("Describe your problem (like Arjuna on the battlefield):")
+
 language = st.selectbox("Choose response language:", ["English", "Hindi", "Telugu"])
 submit = st.button("⚔️ Ask Krishna")
 
-if submit and user_input.strip():
-    # Find nearest verse from FAISS
-    query_emb = embedder.encode([user_input])
-    D, I = index.search(np.array(query_emb).astype("float32"), k=1)
-    verse_data = verses[I[0][0]]
+if submit and name.strip() and query.strip():
+    results = find_relevant_verses(query)
 
-    sanskrit_text = verse_data["sanskrit"]
-    english_text = verse_data["english"]
-
-    # LLM prompt
+    # Build prompt
     prompt = f"""
-    You are Lord Krishna, guiding Arjuna in the Mahabharata.
+    You are Lord Krishna, guiding {name} as a mentor and teacher in the Bhagavad Gita. 
 
-    User’s Problem:
-    {user_input}
+    {name} has come to you with a personal problem:
 
-    Relevant Verse:
-    Sanskrit:
-    {sanskrit_text}
+    Problem:
+    {query}
 
-    Translation:
-    {english_text}
+    Your task:
+    1. Print the most relevant sloka(s) in Sanskrit first.
+    2. Use the teachings of the Bhagavad Gita, especially relevant Slokas, to respond. 
+    3. When quoting a sloka, provide:
+       - The Sanskrit verse.
+       - A simple English translation.
+       - A personalised explanation, tying it directly to the user's problem.
+    4. Use the following knowledge base to support your answer:
+    {results}
 
-    Task:
-    1. Explain the verse in the context of the user's problem.
-    2. Speak like Krishna — compassionate, wise, mentor-like.
-    3. Make it epic, as if on the battlefield of Kurukshetra.
+    Tone:
+    - Compassionate, wise, and mentor-like (as Krishna speaking directly to Arjuna).
+    - Personalise the response so {name} feels Krishna is guiding them personally.
     """
 
     with st.spinner("🕉️ Krishna is speaking..."):
         response = client.chat.completions.create(
-            model="HuggingFaceH4/zephyr-7b-beta",
+            model="mistralai/Mistral-7B-Instruct-v0.2",
             messages=[
                 {"role": "system", "content": "You are Lord Krishna, guiding with compassion and wisdom."},
                 {"role": "user", "content": prompt}
-            ],
-            max_tokens=400,
-            temperature=0.7
+            ]
         )
         krishna_response = response.choices[0].message["content"]
 
@@ -80,9 +85,14 @@ if submit and user_input.strip():
         if language != "English":
             krishna_response = GoogleTranslator(source="auto", target=lang_map[language]).translate(krishna_response)
 
-    # Display results
-    st.subheader("📜 Sanskrit Verse")
-    st.markdown(f"<div style='font-size:18px; color:orange;'>{sanskrit_text}</div>", unsafe_allow_html=True)
-
-    st.subheader("🪔 Krishna's Guidance")
+    # -------------------
+    # Display
+    # -------------------
+    st.subheader("📜 Krishna's Guidance")
     st.markdown(f"<div style='font-size:18px;'>{krishna_response}</div>", unsafe_allow_html=True)
+
+    st.subheader("🔎 Relevant Verses")
+    for verse in results:
+        st.markdown(f"**🕉️ Chapter {verse['chapter']}, Verse {verse['verse']}**")
+        st.markdown(f"📜 Sanskrit: {verse['sanskrit']}")
+        st.markdown(f"🔹 English: {verse['english']}")
