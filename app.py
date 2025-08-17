@@ -20,7 +20,7 @@ def load_resources():
 index, data, model = load_resources()
 
 # Hugging Face client
-client = InferenceClient(token="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")
+client = InferenceClient(token="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")
 
 # -------------------
 # Utility: search verses
