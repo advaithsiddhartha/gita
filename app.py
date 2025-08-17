@@ -20,8 +20,8 @@ def load_resources():
 index, data, model = load_resources()
 
 # Hugging Face client
-client = InferenceClient(token="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")
-
+HF_TOKEN = os.getenv("HF_TOKEN", st.secrets.get("HF_TOKEN"))
+client = InferenceClient(token=HF_TOKEN)
 # -------------------
 # Utility: search verses
 # -------------------
