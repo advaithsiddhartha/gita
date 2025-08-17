@@ -4,7 +4,7 @@ import json
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from huggingface_hub import InferenceClient
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 
 # -------------------
 # Load FAISS + verses
@@ -19,7 +19,6 @@ def load_index():
 index, verses = load_index()
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 client = InferenceClient(token="YOUR_HF_TOKEN")   # <-- replace with your HF token
-translator = Translator()
 
 # -------------------
 # Streamlit UI
@@ -27,7 +26,7 @@ translator = Translator()
 st.set_page_config(page_title="🕉️ Krishna's Guidance", page_icon="🪔", layout="centered")
 
 st.markdown("<h1 style='text-align: center; color: gold;'>🪔 Krishna's Guidance</h1>", unsafe_allow_html=True)
-st.write("Ask your question, Arjuna...")
+st.write("Ask your question, Arjuna, and let Krishna guide you...")
 
 user_input = st.text_area("Enter your problem here:", "")
 language = st.selectbox("Choose response language:", ["English", "Hindi", "Telugu"])
@@ -74,7 +73,7 @@ if submit and user_input.strip():
         # Translate if needed
         lang_map = {"English": "en", "Hindi": "hi", "Telugu": "te"}
         if language != "English":
-            krishna_response = translator.translate(krishna_response, dest=lang_map[language]).text
+            krishna_response = GoogleTranslator(source="auto", target=lang_map[language]).translate(krishna_response)
 
     st.subheader("📜 Sanskrit Verse")
     st.markdown(f"<div style='font-size:18px; color:orange;'>{sanskrit_text}</div>", unsafe_allow_html=True)
