@@ -17,7 +17,7 @@ def load_index():
     return index, verses
 
 index, verses = load_index()
-embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", use_auth_token="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")
+embedder = SentenceTransformer("all-MiniLM-L6-v2", use_auth_token="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")
 
 # Replace with your Hugging Face token
 client = InferenceClient(token="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")
