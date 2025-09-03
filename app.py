@@ -131,7 +131,7 @@ button {
 """, unsafe_allow_html=True)
 
 # Header
-st.markdown('<div class="main-header"><h1>Ask Krishna</h1><p>Receive divine guidance from the timeless wisdom of Krishna</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>Hey Krishna</h1><p>Receive divine guidance from the timeless wisdom of Krishna</p></div>', unsafe_allow_html=True)
 
 # Form
 with st.container():
