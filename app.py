@@ -205,16 +205,14 @@ if mode and name.strip() and query.strip():
     st.markdown(formatted_response, unsafe_allow_html=True)
 
     # Display verses
-    verses_html = '<div class="verse-card"><h3 style="text-align:center;color:#FFD700;">🔎 Relevant Verses</h3>'
+   # Display verses normally
+    st.markdown("## 🔎 Relevant Verses")
     for v in results:
         translation = v.get(language.lower(), v.get("english", ""))
-        verses_html += f"""
-        <div class="verse-block">
-            <p><b>🕉️ Chapter {v['chapter']}, Verse {v['verse']}</b></p>
-            <p class="verse-sanskrit">{v['sanskrit']}</p>
-            <p class="verse-translation">{translation}</p>
-        </div>
-        """
-    verses_html += "</div>"
+        st.write(f"**Chapter {v['chapter']}, Verse {v['verse']}**")
+        st.write(f"Sanskrit: {v['sanskrit']}")
+        st.write(f"Translation ({language}): {translation}")
+        st.write("---")
+
     st.markdown(verses_html, unsafe_allow_html=True)
 
