@@ -53,7 +53,7 @@ st.set_page_config(page_title="🕉️ Krishna's Guidance", page_icon="🪔", la
 st.markdown("""
 <style>
 body {
-    background: linear-gradient(135deg, #000813 0%, #011035 50%, #000000 100%);
+    background: #FFFFFF ;
     color: #F5F5F5;
     font-family: 'DM Sans', sans-serif;
 }
