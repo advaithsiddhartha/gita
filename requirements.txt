@@ -1,6 +1,6 @@
 streamlit
 faiss-cpu
+numpy
 sentence-transformers
-huggingface-hub
-deep-translator
-
+google-generativeai
+python-dotenv
