@@ -194,12 +194,20 @@ if mode and name.strip() and query.strip():
     # Display verses
     verses_html = '<div class="verse-card"><h3 style="text-align:center;color:#FFD700;">🔎 Relevant Verses</h3>'
     for v in results:
-        verses_html += f'''
-        <div class="verse-block">
-            <p>🕉️ <b>Chapter {v['chapter']}, Verse {v['verse']}</b></p>
-            <p>📜 Sanskrit: <b>{v['sanskrit']}</b></p>
-            <p>🔹 Translation ({language}): <b>{v.get(language.lower(), v['english'])}</b></p>
-        </div>
-        '''
-    verses_html += '</div>'
-    st.markdown(verses_html, unsafe_allow_html=True)
+# Display verses properly
+        verses_html = """
+        <div class="verse-card">
+            <h3 style="text-align:center;color:#FFD700;">🔎 Relevant Verses</h3>
+        """
+        for v in results:
+            translation = v.get(language.lower(), v.get("english", ""))
+            verses_html += f"""
+            <div class="verse-block">
+                <p>🕉️ <b>Chapter {v['chapter']}, Verse {v['verse']}</b></p>
+                <p>📜 Sanskrit:<br><b>{v['sanskrit']}</b></p>
+                <p>🔹 Translation ({language}):<br><b>{translation}</b></p>
+            </div>
+            """
+        verses_html += "</div>"
+        st.markdown(verses_html, unsafe_allow_html=True)
+
