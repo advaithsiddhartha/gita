@@ -214,5 +214,4 @@ if mode and name.strip() and query.strip():
         st.write(f"Translation ({language}): {translation}")
         st.write("---")
 
-    st.markdown(verses_html, unsafe_allow_html=True)
 
