@@ -110,9 +110,22 @@ button {
 .verse-block {
     margin: 15px 0;
     padding: 15px;
-    border-left: 4px solid #FFD700;
     background: rgba(255,255,255,0.05);
     border-radius: 10px;
+    text-align: center;
+}
+.verse-block p {
+    margin: 10px 0;
+}
+.verse-sanskrit {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #FFD700;
+    font-family: "Noto Serif Devanagari", serif;
+}
+.verse-translation {
+    font-size: 1.1rem;
+    color: #F5F5F5;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -194,20 +207,14 @@ if mode and name.strip() and query.strip():
     # Display verses
     verses_html = '<div class="verse-card"><h3 style="text-align:center;color:#FFD700;">🔎 Relevant Verses</h3>'
     for v in results:
-# Display verses properly
-        verses_html = """
-        <div class="verse-card">
-            <h3 style="text-align:center;color:#FFD700;">🔎 Relevant Verses</h3>
+        translation = v.get(language.lower(), v.get("english", ""))
+        verses_html += f"""
+        <div class="verse-block">
+            <p><b>🕉️ Chapter {v['chapter']}, Verse {v['verse']}</b></p>
+            <p class="verse-sanskrit">{v['sanskrit']}</p>
+            <p class="verse-translation">{translation}</p>
+        </div>
         """
-        for v in results:
-            translation = v.get(language.lower(), v.get("english", ""))
-            verses_html += f"""
-            <div class="verse-block">
-                <p>🕉️ <b>Chapter {v['chapter']}, Verse {v['verse']}</b></p>
-                <p>📜 Sanskrit:<br><b>{v['sanskrit']}</b></p>
-                <p>🔹 Translation ({language}):<br><b>{translation}</b></p>
-            </div>
-            """
-        verses_html += "</div>"
-        st.markdown(verses_html, unsafe_allow_html=True)
+    verses_html += "</div>"
+    st.markdown(verses_html, unsafe_allow_html=True)
 
